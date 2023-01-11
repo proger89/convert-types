@@ -1,0 +1,19 @@
+{
+    "name": "proger89/convert-types",
+    "type": "library",
+    "require": {
+        "colinodell/json5": "^2.3",
+        "jtrumbull/xml-parser": "^1.0",
+        "shtrihstr/html-serializer": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Proger89\\ConvertTypes\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ruslan"
+        }
+    ]
+}
