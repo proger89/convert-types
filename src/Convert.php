@@ -59,16 +59,16 @@ class Convert{
     }
 
     private function isXML($data) {
-        $doc = @simplexml_load_string($data);
-        if ($doc) {
-            return true;
-        } else {
-            return false;
-        }
+        libxml_use_internal_errors(true);
+        simplexml_load_string($data);
+        $errors = libxml_get_errors();
+        libxml_clear_errors();
+
+        return empty($errors);
     }
     private function isHTML($data) {
         if($data != strip_tags($data)) {
-           return true;
+            return true;
         }
         return false;
     }
