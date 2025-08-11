@@ -1,66 +1,102 @@
-# Convert types data
-Convert to different formats.
+# Convert Types Data
 
-For instance:
+A flexible and extensible library for converting data between different formats.
 
-+ XML -> JSON
-+ JSON -> XML
-+ HTML -> JSON
-+ HTML -> XML
+## Supported Conversions
 
-etc.
+*   XML -> JSON
+*   JSON -> XML
+*   HTML -> JSON
+*   HTML -> XML
 
-HTML to JSON
+## Installation
+
+```bash
+composer require proger89/convert-types
+```
+
+## Usage
+
+### Basic Conversion
+
+To convert data, create an instance of the `Converter` class and use the `convert` method. The library will automatically detect the input data type.
+
 ```php
-$html = "<html><body>Hello <i>This is my car</i></body></html>"
+use Proger89\ConvertTypes\Converter;
 
-$convert = new Convert();
-print $convert->to($html,'json') 
- ```
-or use to constant
-```php
-$convert = new Convert();
-print $convert->to($html,Convert::TYPE_JSON)
- ``` 
+$converter = new Converter();
 
-JSON to XML
-```php
-$json = "[
-	{
-		color: "red",
-		value: "#f00"
-	},
-	{
-		color: "green",
-		value: "#0f0"
-	},
-	{
-		color: "blue",
-		value: "#00f"
-	},
-	{
-		color: "cyan",
-		value: "#0ff"
-	},
-	{
-		color: "magenta",
-		value: "#f0f"
-	},
-	{
-		color: "yellow",
-		value: "#ff0"
-	},
-	{
-		color: "black",
-		value: "#000"
-	}
-]"
+// Convert HTML to JSON
+$html = '<html><body><p>Hello World</p></body></html>';
+$json = $converter->convert($html, 'Json');
+echo $json;
 
-$convert = new Convert();
-print $convert->to($html,'xml')
- ``` 
-or use to constant
+// Convert JSON to XML
+$json = '{"user": {"name": "John Doe", "email": "john.doe@example.com"}}';
+$xml = $converter->convert($json, 'Xml');
+echo $xml;
+```
+
+### Extending the Library
+
+The library is designed to be easily extensible. You can add your own converters and type detectors.
+
+#### Adding a New Converter
+
+To add a new converter, create a class that implements the `ConverterInterface` and register it with the `Converter` instance.
+
 ```php
-$convert = new Convert();
-print $convert->to($html,Convert::TYPE_XML)
- ``` 
+use Proger89\ConvertTypes\Converter;
+use Proger89\ConvertTypes\ConverterInterface;
+
+// 1. Create your custom converter
+class YamlToJsonConverter implements ConverterInterface
+{
+    public function convert($data)
+    {
+        // Your conversion logic here...
+        return json_encode(yaml_parse($data));
+    }
+}
+
+// 2. Register your converter
+$converter = new Converter();
+$converter->addConverter('Yaml', 'Json', new YamlToJsonConverter());
+
+// 3. Use it!
+$yaml = "user:\n  name: Jane Doe\n  email: jane.doe@example.com";
+$json = $converter->convert($yaml, 'Json');
+echo $json;
+```
+
+#### Adding a New Type Detector
+
+To add a new type detector, create a class that implements the `TypeDetectorInterface` and register it.
+
+```php
+use Proger89\ConvertTypes\Converter;
+use Proger89\ConvertTypes\TypeDetectorInterface;
+
+// 1. Create your custom detector
+class YamlDetector implements TypeDetectorInterface
+{
+    public function detect($data)
+    {
+        // Your detection logic here...
+        // For example, check for common YAML syntax
+        return is_string($data) && (strpos($data, ': ') !== false);
+    }
+}
+
+// 2. Register your detector
+$converter = new Converter();
+$converter->addDetector('Yaml', new YamlDetector());
+
+// Now the converter can auto-detect YAML data
+```
+
+## Running Tests
+
+```bash
+./vendor/bin/phpunit
+```
